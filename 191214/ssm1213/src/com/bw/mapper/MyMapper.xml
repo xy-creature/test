@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bw.mapper.MyMapper">
+	<select id="allCity" resultType="City">
+		select ci.*,co.name as coname from t_city ci join t_country co on ci.cid=co.id
+	</select>
+	<delete id="deleteCity">
+		delete from t_city where id=#{id}
+	</delete>
+	<select id="allCountry" resultType="Country">
+		select * from t_country
+	</select>
+	<insert id="saveCity">
+		insert into t_city(name,pop,birthday,cid) values(#{name},#{pop},#{birthday},#{cid})
+	</insert>
+	<select id="getCityById" resultType="City">
+		select * from t_city where id=#{id}
+	</select>
+	<update id="updateCity">
+		update t_city set name=#{name},pop=#{pop},birthday=#{birthday},cid=#{cid}
+			where id=#{id}
+	</update>
+	<select id="queryCity" resultType="City">
+		select ci.*,co.name as coname from t_city ci join t_country co on ci.cid=co.id
+		<where>
+			<if test="key!=null and key!=''">
+				and ci.name like '%${key}%'
+			</if>
+			<if test="start!=null and start!=''">
+				<![CDATA[
+					and ci.birthday >= #{start}
+				]]>
+			</if>
+			<if test="end!=null and end!=''">
+				<![CDATA[
+					and ci.birthday <= #{end}
+				]]>
+			</if>
+			<if test="cid>0">
+				and ci.cid=#{cid}
+			</if>
+		</where>
+	</select>
+	<delete id="delete">
+		delete from t_city where id in 
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	<select id="allCountry2" resultType="Country">
+		select co.*,GROUP_CONCAT(ci.name) as citynames 
+			from t_country co join t_city ci on ci.cid=co.id group by co.id
+	</select>
+	<select id="getCityByCountry" resultType="City">
+		select * from t_city c where c.cid=#{id}
+	</select>
+</mapper>
